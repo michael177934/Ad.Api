@@ -1,15 +1,14 @@
-﻿using Ad.API.Resources.User;
-using Ad.Core.Models;
+﻿using Ad.Core.Models;
 using Ad.Core.Response;
 using Ad.Core.Services;
-using Ad.Service;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MySqlX.XDevAPI.Common;
 
 namespace Ad.Api.Controllers
 {
     [Route("api/[controller]")]
+    [AllowAnonymous]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -22,41 +21,25 @@ namespace Ad.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetAccount(string id)
+        public async Task<ActionResult<OperationResponse<ApplicationUser>>> GetAccount(string id)
         {
-            var account = _accountRetrieval.GetAccountByUserId(id);
-
-            if (account == null)
-            {
-                return NotFound("Account not found.");
-            }
-
+            var account = await  _accountRetrieval.GetAccountByUserId(id);
             return Ok(account);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAccount([FromBody] UserProfile user)
+        public async Task<ActionResult<OperationResponse<ApplicationUser>>> UpdateAccount(ApplicationUser user)
         {
             var result = await _accountRetrieval.UpdateProfile(user);
-            if (!result.Success)
-                return Ok(APIResponse.Error(result.Message));
-
-            var userResource = _mapper.Map<UserProfileResource>(result.Data);
-
-            return Ok(APIResponse.Success(result.Message, userResource));
+           return Ok(result);
         }
 
         [HttpPost("transfer")]
-        public async Task<IActionResult> TransferFunds(string senderAccountId, string recipientAccountId, decimal amount)
+        public async Task<ActionResult<APIResponse<TransactionResponse>>> TransferFunds(Transaction transaction)
         {
-            var result = await _accountRetrieval.TransferFunds(senderAccountId, recipientAccountId, amount);
-
-            if (!result.Success)
-            {
-                return BadRequest("Transfer failed.");
-            }
-
-            return Ok("Transfer successful.");
+            var result = await _accountRetrieval.TransferFunds(transaction);
+            return Ok(result);
+            
         }
 
     }

@@ -9,16 +9,16 @@ namespace Ad.Core.Models
         public string Password { get; set; }
         public string Email { get; set; }
         public string BVN { get; set; }
-        public DateTime DateOfBirth { get; set; }
         public Guid TenantId { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string AccountNumber { get; set; }
-        public string ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public bool IsDeleted { get; set; }
-        public decimal Balance { get; set; }
-        
+        public bool HasSufficientBalance(decimal amount)
+        {
+            return Balance >= amount;
+        }
+        public decimal? Balance { get; set; }
+       
 
     }
 

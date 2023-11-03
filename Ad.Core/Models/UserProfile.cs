@@ -8,7 +8,7 @@ namespace Ad.Core.Models
 {
     public class UserProfile
     {
-        public long Id { get; set; }
+        public string Id { get; set; }
         public string ProfileId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
@@ -23,6 +23,5 @@ namespace Ad.Core.Models
         public string AccountNumber { get; set; }
         public string BankName { get; set; }
         public Guid TenantId { get; set; }
-        public ApplicationUser Profile { get; set; }
     }
 }

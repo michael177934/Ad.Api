@@ -8,15 +8,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Ad.API.ActionFilters;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
+using Ad.API.ExtensionMethods;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,21 +30,24 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File(Path.Combine(logPath, "log.txt"), restrictedToMinimumLevel: LogEventLevel.Information)
     .CreateLogger();
 builder.Services.AddControllers();
+builder.AddConfigurations();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(opt => { opt.User.RequireUniqueEmail = false; })
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true);
-builder.Services.AddDbContext<DataContext>(options =>
-{
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.EnableSensitiveDataLogging(true);
-});
-
-
+//builder.Services.AddDbContext<DataContext>(options =>
+//{
+//    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"));
+//    //options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+//    options.EnableSensitiveDataLogging(true);
+//});
+builder.Services.AddDbContext<DataContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton(Log.Logger);
 builder.Services.Configure<JwtSetting>(builder.Configuration.GetSection("JwtSetting"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+builder.Services.AddSwaggerExtension();
 builder.Services.AddScoped<IUnitOfWork, UnitofWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -67,33 +71,33 @@ builder.Services.AddAuthentication(opt =>
     };
 });
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Advancly Take Home Assessment", Version = "v1" });
-    c.OperationFilter<TenantHeaderOperationFilter>();
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "Jwt Authorization bearer token",
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
-    });
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Advancly Take Home Assessment", Version = "v1" });
+//    c.OperationFilter<TenantHeaderOperationFilter>();
+//    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        Description = "Jwt Authorization bearer token",
+//        In = ParameterLocation.Header,
+//        Name = "Authorization",
+//        Type = SecuritySchemeType.ApiKey
+//    });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new List<string>()
-                    }
-                });
-});
+//    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+//                {
+//                    {
+//                        new OpenApiSecurityScheme
+//                        {
+//                            Reference = new OpenApiReference
+//                            {
+//                                Type = ReferenceType.SecurityScheme,
+//                                Id = "Bearer"
+//                            }
+//                        },
+//                        new List<string>()
+//                    }
+//                });
+//});
 
 builder.Services.AddControllers().AddMvcOptions(opt =>
 {
@@ -125,7 +129,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+//app.UseSwaggerExtension();
+app.UseHttpsRedirection();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

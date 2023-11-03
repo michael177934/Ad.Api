@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ad.Core.Response
+namespace Ad.Test
 {
     public class SuccessResponse<T>
     {
@@ -20,23 +20,6 @@ namespace Ad.Core.Response
         public string ResponseCode { get; set; }
         public string Message { get; set; }
     }
-
-
-    public class APIResponses
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-
-        // Add additional properties as needed
-    }
-
-    public class APIResponse<T> : APIResponse
-    {
-        public T Data { get; set; }
-
-        // Add additional properties as needed
-    }
-
 
     public class APIResponse
     {

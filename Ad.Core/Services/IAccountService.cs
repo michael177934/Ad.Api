@@ -11,8 +11,9 @@ namespace Ad.Core.Services
     public interface IAccountService
     {
         Task<OperationResponse<ApplicationUser>> GetAccountByUserId(string id);
-        Task<OperationResponse<UserProfile>> UpdateProfile(UserProfile userProfile);
+        Task<OperationResponse<ApplicationUser>> UpdateProfile(ApplicationUser userProfile);
         Task<OperationResponse<bool>> TransferFunds(string senderAccountId, string recipientAccountId, decimal amount);
+        Task<OperationResponse<bool>> TransferFunds(Transaction transaction);
     }
 }
 

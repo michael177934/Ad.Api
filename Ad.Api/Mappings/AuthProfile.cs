@@ -13,6 +13,13 @@ namespace Tarvcent.API.Mappings
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.Email))
                 .ForMember(d => d.CreatedDate, opt => opt.MapFrom(s => DateTime.UtcNow));
 
+
+
+            //CreateMap<Transaction, ApplicationUser>()
+            //    .ForMember(d => d.CreatedBy, opt => opt.MapFrom(s => s.Email))
+            //    .ForMember(d => d.UserName, opt => opt.MapFrom(s => s.Email))
+            //    .ForMember(d => d.CreatedDate, opt => opt.MapFrom(s => DateTime.UtcNow));
+
         }
     }
 }

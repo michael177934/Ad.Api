@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ad.Core.Models
+namespace Ad.Core.Response
 {
-    public class Transaction
+    public class TransactionResponse
     {
         public string Id { get; set; }
         public string SenderAccountId { get; set; }
@@ -20,5 +20,4 @@ namespace Ad.Core.Models
             return Balance >= amount;
         }
     }
-
 }

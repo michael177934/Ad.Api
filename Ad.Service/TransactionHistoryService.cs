@@ -16,10 +16,12 @@ namespace Ad.Service
         {
             var transaction = new Transaction
             {
+                Id = Guid.NewGuid().ToString(),
                 SenderAccountId = senderAccountId,
                 RecipientAccountId = recipientAccountId,
                 Amount = amount,
-                Timestamp = DateTime.Now
+                Timestamp = DateTime.Now,
+                Balance = amount,
             };
 
             _transactions.Add(transaction);

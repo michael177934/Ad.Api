@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ad.Data", "Ad.Data\Ad.Data.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ad.Service", "Ad.Service\Ad.Service.csproj", "{3E2E93B1-F446-4796-8AD9-78575EE5DF1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ad.Test", "Ad.Test\Ad.Test.csproj", "{6CA0AF69-3DE9-43E7-B044-9A393B364C6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ad.Test", "Ad.Test\Ad.Test.csproj", "{6CA0AF69-3DE9-43E7-B044-9A393B364C6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

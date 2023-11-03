@@ -27,12 +27,10 @@ namespace Ad.Service
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
-            //RoleManager<ApplicationRole> roleManager,
             IUnitOfWork unitOfWork,
             IOptions<JwtSetting> jwtSetting)
         {
             _userManager = userManager;
-            //_roleManager = roleManager;
             _unitOfWork = unitOfWork;
             _jwtSetting = jwtSetting.Value;
         }
@@ -47,8 +45,6 @@ namespace Ad.Service
                 return new OperationResponse<object>("Username or Password is incorrect");
 
             var result = await GenerateAuthToken(user);
-            var userProfile = await _unitOfWork.UserProfiles.SingleOrDefaultAsync(x => x.ProfileId == user.Id && x.TenantId == user.TenantId);
-
             var data = new
             {
                 Token = result.Item1,
@@ -56,14 +52,12 @@ namespace Ad.Service
                 Name = user.FirstName + ' ' + user.LastName,
                 user.Email,
                 TenantId = tenantId,
+                user.AccountNumber,
+                user.BVN,
+                user.Balance
             };
 
-            var extraResult = new
-            {
-                Permissions = result.Item2
-            };
-
-            return new OperationResponse<object>("login successful", data, true, extraResult);
+            return new OperationResponse<object>("login successful", data, true);
         }
 
 
@@ -74,7 +68,8 @@ namespace Ad.Service
 
             user.TenantId = tenantId;
             user.UserName = string.Concat(tenantId, "-", user.Email);
-
+            user.AccountNumber = GenerateAccountNumber();
+            user.BVN = GenerateBVNNumber();
             var result = await _userManager.CreateAsync(user, password);
 
             if (!result.Succeeded)
@@ -87,13 +82,15 @@ namespace Ad.Service
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                AccountNumber = user.AccountNumber,
             };
 
             await _unitOfWork.UserProfiles.AddAsync(userProfile);
-            await _unitOfWork.CommitChangesAsync();
+            //await _unitOfWork.CommitChangesAsync();
             return new OperationResponse<ApplicationUser>("registration successful", user, true);
         }
+
 
         private async Task<(string,List<ControllerServiceModel>)> GenerateAuthToken(ApplicationUser user)
         {
@@ -133,6 +130,29 @@ namespace Ad.Service
             var tokenString = tokenHandler.WriteToken(token);
 
             return (tokenString, permissions);
+        }
+
+        private string GenerateAccountNumber()
+        {
+            Random rnd = new Random();
+
+            int firstDigit = rnd.Next(0, 10);
+
+            string remainingDigits = string.Concat(Enumerable.Range(0, 9).Select(n => rnd.Next(0, 10).ToString()));
+
+            return firstDigit.ToString() + remainingDigits;
+        }
+
+
+        private string GenerateBVNNumber()
+        {
+            Random rnd = new Random();
+
+            int firstDigit = rnd.Next(0, 11);
+
+            string remainingDigits = string.Concat(Enumerable.Range(0, 10).Select(n => rnd.Next(0, 11).ToString()));
+
+            return firstDigit.ToString() + remainingDigits;
         }
     }
 }
